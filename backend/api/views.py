@@ -28,7 +28,7 @@ from .pagination import SimplePagination
 
 
 @api_view(['POST', 'DELETE'])
-@permission_classes([permissions.IsAuthenticated,])
+@permission_classes([permissions.IsAuthenticated, ])
 def author_follow(request, pk):
     """
     Подписка на автора.
