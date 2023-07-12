@@ -10,7 +10,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.loading_ingredients()
 
-
     def loading_ingredients(self, file='ingredients.csv'):
         file_path = f'./data/{file}'
         with open(file_path, newline='', encoding='utf-8') as f:
