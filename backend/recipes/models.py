@@ -26,6 +26,7 @@ class Tag(models.Model):
     )
 
     class Meta:
+        ordering = ('name',)
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
 
@@ -156,7 +157,7 @@ class Favorite(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='favorites',
+        related_name='favorite',
         verbose_name='Пользователь'
     )
     recipe = models.ForeignKey(
@@ -185,13 +186,13 @@ class ShoppingCart(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='shopp_cart',
+        related_name='shopping_user',
         verbose_name='Пользователь'
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='shopp_cart',
+        related_name='shopping_user',
         verbose_name='Рецепт'
     )
 

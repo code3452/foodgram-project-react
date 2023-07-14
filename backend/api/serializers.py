@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from drf_extra_fields.fields import Base64ImageField
 from rest_framework.fields import IntegerField, SerializerMethodField
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
 
@@ -66,15 +66,14 @@ class CustomUserSerializer(UserSerializer):
             'is_subscribed',
         )
 
-    def get_is_subscribed(self, obj):
+    def get_is_subscribed(self):
         """
         Проверяем подписку пользователя на автора.
         """
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
-        return Follow.objects.filter(user=self.context['request'].user,
-                                     author=obj).exists()
+        return Follow.follower.user()
 
 
 class FollowSerializer(serializers.ModelSerializer):
@@ -155,9 +154,9 @@ class RecipeIngredientSerializer(ModelSerializer):
             'cooking_time',
         )
 
-    def get_ingredients(self, obj):
+    def get_ingredients(self):
         """Метод ингредиентов в рецепте."""
-        ingredients = IngredientsInRecipe.objects.filter(recipe=obj)
+        ingredients = IngredientsInRecipe.ingredient_list.ingredient()
         serializer = RecipeIngredientSerializer(ingredients, many=True)
         return serializer.data
 
@@ -254,7 +253,6 @@ class RecipeCreateorChangesSerializer(ModelSerializer):
 
     def to_representation(self, instance):
         request = self.context.get('request')
-        print(request)
         context = {'request': request}
         return RecipeSerializer(
             instance.recipe,
