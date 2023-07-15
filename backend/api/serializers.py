@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework.fields import IntegerField, SerializerMethodField
+from rest_framework.fields import  SerializerMethodField
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
@@ -167,8 +167,7 @@ class RecipeIngredientSerializer(ModelSerializer):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
-        return Favorite.objects.filter(recipe=obj,
-                                       user=request.user).exists()
+        return Favorite.objects.favorites()
 
     def get_is_in_shopping_cart(self, obj):
         """
@@ -177,8 +176,7 @@ class RecipeIngredientSerializer(ModelSerializer):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
-        return ShoppingCart.objects.filter(recipe=obj,
-                                           user=request.user).exists()
+        return ShoppingCart.shopping_user()
 
 
 class IngredientsReadInRecipeSerializer(ModelSerializer):
@@ -195,8 +193,6 @@ class IngredientsReadInRecipeSerializer(ModelSerializer):
 
 class RecipeAddIngredientSerializer(ModelSerializer):
     """Серилизатор записи ингредиентов в рецепт."""
-    id = IntegerField()
-    amount = IntegerField()
 
     class Meta:
         model = IngredientsInRecipe
@@ -246,7 +242,7 @@ class RecipeCreateorChangesSerializer(ModelSerializer):
     def update(self, recipe, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
-        IngredientsInRecipe.objects.filter(recipe=recipe).delete()
+        IngredientsInRecipe.ingredient_list.recipe().delete()
         self.add_ingredients(ingredients, recipe)
         recipe.tags.set(tags)
         return super().update(recipe, validated_data)

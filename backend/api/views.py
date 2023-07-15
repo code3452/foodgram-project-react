@@ -22,7 +22,6 @@ from .serializers import (IngredientSerializer,
 from .filters import FilterIngredient
 from .permissions import IsAdminAuthorOrReadOnly, IsAdminOrReadOnly
 from users.models import User, Follow
-
 from .shop_list import shop_list
 from .pagination import SimplePagination
 
