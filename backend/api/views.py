@@ -44,7 +44,7 @@ def author_follow(request, pk):
         except IntegrityError:
             message = 'Вы уже подписаны на этого автора'
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
-        follows = User.objects.all().filter(username=author)
+        follows = User.following.all()
         serializer = FollowSerializer(
             follows,
             context={'request': request},

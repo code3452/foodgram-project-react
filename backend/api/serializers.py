@@ -101,7 +101,7 @@ class FollowSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if not user:
             return False
-        return Follow.objects.filter(user=user, author=obj).exists()
+        return Follow.following.all()
 
     def get_recipes(self, obj):
         request = self.context.get('request')
@@ -160,16 +160,16 @@ class RecipeIngredientSerializer(ModelSerializer):
         serializer = RecipeIngredientSerializer(ingredients, many=True)
         return serializer.data
 
-    def get_is_favorited(self, obj):
+    def get_is_favorited(self):
         """
         Проверка на наличие рецепта в избранном.
         """
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
-        return Favorite.objects.favorites()
+        return Favorite.favorites.all()
 
-    def get_is_in_shopping_cart(self, obj):
+    def get_is_in_shopping_cart(self):
         """
         Проверка на наличие рецепта в списке покупок.
         """
