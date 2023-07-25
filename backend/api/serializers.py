@@ -1,12 +1,10 @@
-from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework.fields import SerializerMethodField
 from drf_extra_fields.fields import Base64ImageField
+from recipes.models import Ingredient, IngredientsInRecipe, Recipe, Tag
+from rest_framework import serializers
+from rest_framework.fields import SerializerMethodField
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
-
-from recipes.models import (Tag, Ingredient, Recipe,
-                            IngredientsInRecipe)
 from users.models import User
 
 
@@ -120,7 +118,7 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Recipe
         fields = (
@@ -129,6 +127,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'image',
             'cooking_time'
         )
+
 
 class IngredientsReadInRecipeSerializer(ModelSerializer):
     """Чтение ингредиентов в рецепте."""
@@ -186,7 +185,7 @@ class RecipeIngredientSerializer(ModelSerializer):
         Проверка на наличие рецепта в списке покупок.
         """
         request = self.context.get('request').user
-        if request.is_anonymous:    
+        if request.is_anonymous:
             return False
         return request.shopping_user.filter(recipe=obj).exists()
 

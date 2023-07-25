@@ -1,30 +1,25 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
+from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Sum
+from recipes.models import Ingredient, IngredientsInRecipe, Recipe, Tag
 from rest_framework import permissions, status
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+from users.models import Follow, User
 
-from recipes.models import (Tag,
-                            Ingredient,
-                            Recipe,
-                            IngredientsInRecipe,)
-from .serializers import (IngredientSerializer,
-                          TagSerializer,
-                          RecipeSerializer,
-                          FollowSerializer,
-                          RecipeCreateorChangesSerializer,
-                          RecipeIngredientSerializer,)
 from .filters import FilterIngredient
-from .permissions import IsAdminAuthorOrReadOnly, IsAdminOrReadOnly
-from users.models import User, Follow
-from .shop_list import shopp_list
 from .pagination import SimplePagination
+from .permissions import IsAdminAuthorOrReadOnly, IsAdminOrReadOnly
+from .serializers import (FollowSerializer, IngredientSerializer,
+                          RecipeCreateorChangesSerializer,
+                          RecipeIngredientSerializer, RecipeSerializer,
+                          TagSerializer)
+from .shop_list import shopp_list
 
 
 @api_view(['POST', 'DELETE'])
