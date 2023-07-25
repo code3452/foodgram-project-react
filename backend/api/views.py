@@ -1,34 +1,35 @@
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Sum
-from django.http import HttpResponse
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import IntegrityError
 from rest_framework import permissions, status
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 
 from recipes.models import (Tag,
                             Ingredient,
                             Recipe,
-                            IngredientsInRecipe)
+                            IngredientsInRecipe,)
 from .serializers import (IngredientSerializer,
                           TagSerializer,
-                          FollowSerializer,
                           RecipeSerializer,
-                          RecipeCreateorChangesSerializer)
+                          FollowSerializer,
+                          RecipeCreateorChangesSerializer,
+                          RecipeIngredientSerializer,)
 from .filters import FilterIngredient
 from .permissions import IsAdminAuthorOrReadOnly, IsAdminOrReadOnly
 from users.models import User, Follow
-from .shop_list import shop_list
+from .shop_list import shopp_list
 from .pagination import SimplePagination
 
 
 @api_view(['POST', 'DELETE'])
 @permission_classes([permissions.IsAuthenticated, ])
-def author_follow(request, pk):
+def follow_author(request, pk):
     """
     Подписка на автора.
     """
@@ -37,14 +38,14 @@ def author_follow(request, pk):
 
     if request.method == 'POST':
         if user.id == author.id:
-            message = 'Нельзя подписаться на себя'
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+            content = {'errors': 'Нельзя подписаться на себя'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
         try:
             Follow.objects.create(user=user, author=author)
         except IntegrityError:
-            message = 'Вы уже подписаны на этого автора'
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
-        follows = User.following.all()
+            content = {'errors': 'Вы уже подписаны на данного автора'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        follows = User.objects.all().filter(username=author)
         serializer = FollowSerializer(
             follows,
             context={'request': request},
@@ -56,8 +57,8 @@ def author_follow(request, pk):
         try:
             subscription = Follow.objects.get(user=user, author=author)
         except ObjectDoesNotExist:
-            message = 'Вы не подписаны на этого автора'
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+            content = {'errors': 'Вы не подписаны на данного автора'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
         subscription.delete()
         return HttpResponse('Вы успешно отписаны от этого автора',
                             status=status.HTTP_204_NO_CONTENT)
@@ -66,12 +67,12 @@ def author_follow(request, pk):
 class RecipeViewSet(ModelViewSet):
     """Вьюсет для рецепта."""
     queryset = Recipe.objects.all()
-    permission_classes = (IsAdminAuthorOrReadOnly,)
     serializer_classes = {
-        'retrieve': RecipeSerializer,
-        'list': RecipeSerializer,
+        'retrieve': RecipeIngredientSerializer,
+        'list': RecipeIngredientSerializer,
     }
     default_serializer_class = RecipeCreateorChangesSerializer
+    permission_classes = (IsAdminAuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     pagination_class = SimplePagination
 
@@ -85,15 +86,14 @@ class RecipeViewSet(ModelViewSet):
             related_manager.get(recipe_id=recipe.id).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         if related_manager.filter(recipe=recipe).exists():
-            raise ValidationError('Рецепт есть в избранном')
+            raise ValidationError('Рецепт уже в избранном')
         related_manager.create(recipe=recipe)
         serializer = RecipeSerializer(instance=recipe)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=True,
             permission_classes=[permissions.IsAuthenticated],
-            methods=['POST', 'DELETE'],
-            )
+            methods=['POST', 'DELETE'], )
     def favorite(self, request, pk=None):
         return self._favorite_shopping_post_delete(
             request.user.favorite
@@ -101,21 +101,16 @@ class RecipeViewSet(ModelViewSet):
 
     @action(detail=True,
             permission_classes=[permissions.IsAuthenticated],
-            methods=['POST', 'DELETE'],
-            )
+            methods=['POST', 'DELETE'], )
     def shopping_cart(self, request, pk=None):
         return self._favorite_shopping_post_delete(
             request.user.shopping_user
         )
 
-    @action(
-        detail=False,
-        permission_classes=[permissions.IsAuthenticated]
-    )
-    def shopp_cart_download(self, request):
+    def download_shopping_cart(self, request):
         """Выгрузка списка покупок."""
         user = request.user
-        if not user.shopping_cart.exists():
+        if not user.shopping_user.exists():
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         ingredients = IngredientsInRecipe.objects.filter(
@@ -125,8 +120,8 @@ class RecipeViewSet(ModelViewSet):
             'ingredient__measurement_unit'
         ).annotate(amount=Sum('amount'))
 
-        shopp_list = shop_list(ingredients=ingredients, user=user)
-        return shopp_list
+        shopping_list = shopp_list(ingredients=ingredients, user=user)
+        return shopping_list
 
 
 class IngredientViewSet(ModelViewSet):

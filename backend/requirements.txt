@@ -79,3 +79,4 @@ wcwidth==0.2.5
 weasyprint==59.0
 webencodings==0.5.1
 zopfli==0.2.2
+django_environ==0.10.0
