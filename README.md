@@ -82,7 +82,7 @@ sudo docker compose -f docker-compose.production.yml exec backend python manage.
 
 С проектом поставляются данные об ингредиентах. Заполнить базу данных ингредиентами можно выполнив следующую команду:
 ```bash
-sudo docker compose -f docker-compose.production.yml exec backend python manage.py ingredients
+sudo docker compose -f docker-compose.production.yml exec backend python manage.py ingredient
 ```
 
 Также необходимо заполнить базу данных тегами .  
