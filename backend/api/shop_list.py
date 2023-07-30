@@ -3,7 +3,7 @@ from datetime import datetime
 from django.http import HttpResponse
 
 
-def shopp_list(ingredients, user):
+def shopping_list(ingredients, user):
     today = datetime.today()
     shopp_list = (
         f'Дата: {today:%Y-%m-%d}\n\n'

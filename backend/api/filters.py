@@ -2,8 +2,18 @@ from django_filters.rest_framework import FilterSet, filters
 from recipes.models import Ingredient, Recipe, Tag
 
 
-class FilterRecipe(FilterSet):
-    """Фильтр для сортировки выдачи рецепотов"""
+class Ingredientfilter(FilterSet):
+    """Фильтр для ингредиентов"""
+    name = filters.CharFilter(lookup_expr='startswith')
+
+    class Meta:
+        model = Ingredient
+        fields = ('name',)
+
+
+
+
+class RecipeFilter(FilterSet):
     tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
         to_field_name='slug',
@@ -16,7 +26,7 @@ class FilterRecipe(FilterSet):
 
     class Meta:
         model = Recipe
-        fields = ('tags',)
+        fields = ('tags', 'author',)
 
     def filter_is_favorited(self, queryset, name, value):
         user = self.request.user
@@ -24,17 +34,8 @@ class FilterRecipe(FilterSet):
             return queryset.filter(favorites__user=user)
         return queryset
 
-    def filter_is_in_shopp_cart(self, queryset, name, value):
+    def filter_is_in_shopping_cart(self, queryset, name, value):
         user = self.request.user
         if value and not user.is_anonymous:
-            return queryset.filter(shopping_cart__user=user)
+            return queryset.filter(shopping_user__user=user)
         return queryset
-
-
-class FilterIngredient(FilterSet):
-    """Фильтр для ингредиентов"""
-    name = filters.CharFilter(lookup_expr='startswith')
-
-    class Meta:
-        model = Ingredient
-        fields = ('name',)

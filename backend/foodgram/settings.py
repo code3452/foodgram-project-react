@@ -18,10 +18,10 @@ import environ
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env(
+#env = environ.Env(
     # set casting, default value
-    DEBUG=(bool, False)
-)
+#    DEBUG=(bool, False)
+#)
 
 
 # Quick-start development settings - unsuitable for production
@@ -31,7 +31,7 @@ env = environ.Env(
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = True
 
 ALLOWED_HOSTS = ['foodgram-show.ddns.net', '127.0.0.1', 'localhost']
 
@@ -137,8 +137,13 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+
+    'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
