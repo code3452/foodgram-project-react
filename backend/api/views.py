@@ -1,25 +1,23 @@
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from recipes.models import Ingredient, IngredientsInRecipe, Recipe, Tag
+from djoser.views import UserViewSet
+from recipes.models import (Favorite, Ingredient, IngredientsInRecipe, Recipe,
+                            ShoppingCart, Tag)
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import SAFE_METHODS, IsAuthenticated, AllowAny
+from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from djoser.views import UserViewSet
-
 from users.models import Follow, User
-from recipes.models import ShoppingCart, Favorite
-from .filters import RecipeFilter, Ingredientfilter
+
+from .filters import Ingredientfilter, RecipeFilter
 from .pagination import SimplePagination
 from .permissions import IsAdminAuthorOrReadOnly, IsAdminOrReadOnly
-from .serializers import (FollowSerializer, IngredientSerializer,
+from .serializers import (CustomUserSerializer, FollowSerializer,
+                          IngredientSerializer, RecipebrowseSerializer,
                           RecipeCreateorChangesSerializer,
-                          RecipebrowseSerializer,
-                          TagSerializer,
-                          RecipeShowSerializer,
-                          CustomUserSerializer)
+                          RecipeShowSerializer, TagSerializer)
 from .shop_list import shopping_list
 
 
@@ -66,7 +64,6 @@ class CustomUserViewSet(UserViewSet):
                                       many=True,
                                       context={'request': request})
         return self.get_paginated_response(serializer.data)
-
 
 
 class RecipeViewSet(ModelViewSet):

@@ -1,14 +1,11 @@
-from django.contrib.auth import get_user_model
-from djoser.serializers import UserCreateSerializer, UserSerializer
+from djoser.serializers import UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField
 from recipes.models import Ingredient, IngredientsInRecipe, Recipe, Tag
-from rest_framework.exceptions import ValidationError
-from rest_framework import serializers, status
+from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
 from users.models import Follow, User
-
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -79,9 +76,9 @@ class FollowSerializer(CustomUserSerializer):
     recipes_count = SerializerMethodField()
 
     class Meta(CustomUserSerializer.Meta):
-        fields = CustomUserSerializer.Meta.fields + ('recipes_count', 'recipes')
+        fields = CustomUserSerializer.Meta.fields + ('recipes_count',
+                                                     'recipes')
         read_only_fields = ('email', 'username')
-
 
     def get_recipes(self, obj):
         recipes_limit = self.context['request'].GET.get('recipes_limit')
@@ -227,6 +224,3 @@ class RecipeCreateorChangesSerializer(ModelSerializer):
             recipe,
             context={'request': self.context.get('request')}).data
         return data
-
-
-
