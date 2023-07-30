@@ -95,4 +95,4 @@ sudo docker compose -f docker-compose.production.yml exec backend python manage.
 проекта под логином и паролем администратора (пользователя, созданного командой createsuperuser).
 
 ---
-прописать теги 
+прописать теги в админке
