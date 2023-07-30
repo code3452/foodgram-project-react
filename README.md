@@ -1,6 +1,11 @@
 # praktikum_diplom
 # Проект Foodgram  
+```
+ссылка на проект https://foodgram-show.ddns.net/
 
+log_admin = msi
+password_admin = msi 
+```
 
 # Установка:
 
