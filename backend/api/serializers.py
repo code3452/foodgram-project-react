@@ -81,14 +81,15 @@ class FollowSerializer(CustomUserSerializer):
         read_only_fields = ('email', 'username')
 
     def get_recipes(self, obj):
-        recipes_limit = self.context['request'].GET.get('recipes_limit')
+        request = self.context.get('request')
+        limit = request.GET.get('recipes_limit')
         recipes = obj.recipes.all()
-        if recipes_limit:
-            recipes = recipes[:int(recipes_limit)]
+        if limit:
+            recipes = recipes[:int(limit)]
         return RecipeShowSerializer(
             recipes, many=True, read_only=True).data
 
-    def get_recipes_count(obj):
+    def get_recipes_count(self, obj):
         return obj.recipes.count()
 
 

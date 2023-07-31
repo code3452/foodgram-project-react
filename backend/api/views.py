@@ -25,6 +25,7 @@ class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = (AllowAny,)
+    pagination_class = SimplePagination
 
     @action(
         detail=True,
@@ -43,7 +44,7 @@ class CustomUserViewSet(UserViewSet):
 
             serializer.is_valid()
             Follow.objects.create(user=user, author=author)
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         subscription = get_object_or_404(Follow,
                                          user=user,
@@ -56,7 +57,6 @@ class CustomUserViewSet(UserViewSet):
         permission_classes=[IsAuthenticated]
     )
     def subscriptions(self, request):
-        """Метод для просмотра подписок на авторов."""
         user = request.user
         queryset = User.objects.filter(following__user=user)
         pages = self.paginate_queryset(queryset)
