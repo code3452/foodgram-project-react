@@ -1,7 +1,8 @@
 from djoser.serializers import UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField
 from recipes.models import Ingredient, IngredientsInRecipe, Recipe, Tag
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SerializerMethodField
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
@@ -79,6 +80,21 @@ class FollowSerializer(CustomUserSerializer):
         fields = CustomUserSerializer.Meta.fields + ('recipes_count',
                                                      'recipes')
         read_only_fields = ('email', 'username')
+
+    def validate(self, data):
+        author = self.instance
+        user = self.context.get('request').user
+        if user == author:
+            raise ValidationError(
+                {"errors": "Вы не можете подписаться на самого себя."},
+                code=status.HTTP_400_BAD_REQUEST
+            )
+        if Follow.objects.filter(author=author, user=user).exists():
+            raise ValidationError(
+                {"errors": "Вы уже подписаны на этого автора."},
+                code=status.HTTP_400_BAD_REQUEST
+            )
+        return data
 
     def get_recipes(self, obj):
         request = self.context.get('request')
