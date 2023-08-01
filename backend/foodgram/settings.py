@@ -13,15 +13,15 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
-import environ 
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env( 
+env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False)
-) 
+)
 
 
 # Quick-start development settings - unsuitable for production
@@ -31,7 +31,7 @@ env = environ.Env(
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG') 
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = ['foodgram-show.ddns.net', '127.0.0.1', 'localhost']
 
