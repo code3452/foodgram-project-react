@@ -25,7 +25,6 @@ class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = (AllowAny,)
-    pagination_class = SimplePagination
 
     @action(
         detail=True,

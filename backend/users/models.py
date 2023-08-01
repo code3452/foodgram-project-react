@@ -1,3 +1,4 @@
+from rest_framework.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -80,3 +81,7 @@ class Follow(models.Model):
 
     def __str__(self):
         return f'{self.user} подписан на {self.author}'
+
+    def clean(self):
+        if self.user == self.author:
+            raise ValidationError('Нельзя подписываться на самого себя')
